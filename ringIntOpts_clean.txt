@@ -6,61 +6,61 @@ Please only insert the needed information and do not manipulate the lines on any
 -----------
 
 #1st parameter : inital .fitsFile name
-fitsFileName = Canes_Venatici_large_image_9-MFS-image.fits
+fitsFileName = 
 
 #2nd parameter : array with information about the fake sources
 #                Structure: [[I(fakesource1), FWHM(fakesource1), xpos(fakesource1), ypos(fakesource1)], [I(fakesource2), FWHM(fakesource2)...], ...]
 #                Units: I in mJy, FWHM in arcsec, xpos and ypos in RA and DEC
-fakeSourceArray = [["20", "500", "13:28:03.5", "+33.33.21.0"]]
+fakeSourceArray = [["", "", "", ""]]
 
 #3rd parameter : array with the planned UV cuts in WSClean
 #                Structure: [80, 120, 160, 200, 240, ...]
-uvCutArray = [80, 120, 160, 200, 240]
+uvCutArray = []
 
 #4th parameter : array with the planned robust weighting
 #                Structure: [0.2, 0.5, -0.2, -0.5, ...]
-robustArray = [0.5, -0.2]
+robustArray = []
 
 #5th parameter : array with the planned gaussian tapers for negativ weightings
 #                Structure: [10, 15, 20, ...]
-taperArray = [10]
+taperArray = []
 
 #6th parameter : size of the image produced in wsclean
-wscleanSize = 1538
+wscleanSize = 
 
 #7th parameter : Baseline averaging parameter in wsclean
-baselineParameter = 10.6387917669
+baselineParameter = 
 
 #8th parameter : array with the information about the beam 
 #                Structure: [3.5e-03, 3.5e-03]
-beamInformation = [5.5556e-03, 5.5556e-03]
+beamInformation = []
 
 #9th parameter : minimal value for gaussian b-fitting
-FWHMmin = 20
+FWHMmin = 
 
 #10th parameter: maximal value for gaussian b-fitting
-FWHMmax = 1000
+FWHMmax = 
 
 #11th parameter: increment parameter for gaussian b-fitting
-FWHMstep = 15
+FWHMstep = 
 
 #12th parameter: array with the input directories
-inputDirectoryArray = [P201+35_Canes_Venatici_large.sub.shift.avg.weights.ms.archive.calibrated_model, P204+32_Canes_Venatici_large.sub.shift.avg.weights.ms.archive.calibrated_model]
+inputDirectoryArray = []
 
 #13th parameter: image scale for wsclean in arcsecs
-wscleanScale = 1.5
+wscleanScale = 
 
 #14th parameter: galaxy size in arcsecs
-galSize = 492
+galSize = 
 
 #15th parameter: do gaussian folding
-folding_do = True
+folding_do = False
 
 #16th parameter: target beamwidth in x-direction in arcsec
-targetSigmaX = 20
+targetSigmaX = 
 
 #17th parameter: target beamwidth in y-direction in arcsec
-targetSigmaY = 20
+targetSigmaY = 
 
 #18th parameter: target angle in degree
-targetTheta = 90
+targetTheta = 
