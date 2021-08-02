@@ -20,9 +20,9 @@ from astropy.io import fits
 from astropy.wcs import WCS
 import astropy.wcs.utils as au
 from astropy.utils.data import get_pkg_data_filename
-from astropy.coordinates import SkyCoord  # High-level coordinates
-from astropy.coordinates import ICRS, Galactic, FK4, FK5  # Low-level frames
-from astropy.coordinates import Angle, Latitude, Longitude  # Angles
+from astropy.coordinates import SkyCoord
+from astropy.coordinates import ICRS, Galactic, FK4, FK5
+from astropy.coordinates import Angle, Latitude, Longitude
 import astropy.units as u
 import matplotlib.pyplot as plt
 from matplotlib import rc
@@ -33,7 +33,6 @@ from shutil import copyfile
 import bdsf
 import json
 import astropy.convolution as co
-#from scipy.signal import convolve as scipy_convolve
 from  astropy.convolution import convolve as scipy_convolve
 
 #loads values from the 'ringIntOpts.txt' option sheet.
