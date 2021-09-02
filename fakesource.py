@@ -32,5 +32,5 @@ ax = fig.gca()
 
 ax.add_patch(plt.Circle((0, 0), sigma, color='black', linestyle='dashed', fill = False))
 plt.colorbar()
-plt.savefig('fakesource.png')
+#plt.savefig('fakesource.png')
 plt.show()
