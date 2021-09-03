@@ -675,7 +675,6 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 					fitsFileName = doGaussianFolding(
 					    folding_do, fitsFilePath, fitsFileName, targetbmaj, targetbmin, targetTheta, comb+'_foldedData.fits')
 					fitsFilePath = os.getcwd()+'/'+comb+'/'+file+'/'+fitsFileName
-					print("Done!")
 		# find fakesource data and store in list
 		if file.startswith("fakesource"):
 			for datasheet in os.listdir(os.getcwd()+'/'+comb+'/'+file):
@@ -924,18 +923,27 @@ def interpretAsFloatList(inputString):
 	return out
 
 # removes the point source catalogs that has been created additionally
-
-
 def removeTemporarySourceCatalogs():
     for file in os.listdir():
         if file.endswith('.sourcedb'):
             os.remove(file)
 
+#filters the files in the cwd for a bbs point source catalog. 
+#Make sure that there is only one of them in the cwd!
+def findPointSourceCatalog():
+    for file in os.listdir(os.getcwd()):
+        if file.endswith('.bbs'):
+            out = file
+            print('Found Point Source Catalog: '+str(file))
+    return out
+
+
 # main method.
 def main():
-	print("load parameter sheet..")
+    
+    #loading parameter sheet
+	print("loading parameter sheet..")
 	initFitsFileName, fakeSource_arr, uvCuts_arr, robust_arr, taper_arr, wscleanSize, wscleanBaseLineAv, beamInformation, FWHMFitMinimum, FWHMFitMaximum, FWHMFitSteps, inputDirectory_arr, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta = loadOptions()
-	print("Done!")
 	# rewrite input strings as arrays when needed..
 	fakeSource_arr = interpretAsArray(fakeSource_arr)
 	uvCuts_arr = interpretAsIntList(uvCuts_arr)
@@ -954,18 +962,12 @@ def main():
 	targetbmaj = float(targetbmaj)
 	targetbmin = float(targetbmin)
 	targetTheta = float(targetTheta)
-	print("Done!")
-	print("identifying point sources with PyBDSF..")
-	# pointSourceCatalog = findPointSources(fitsFileName=initFitsFileName)
-	pointSourceCatalog = 'scale02_rms_66_15.bbs'
-	print("Done!")
-	# given in fakeSource_arr. For list structure see function comment
+    print('searching for a point source catalog...')
+	pointSourceCatalog = findPointSourceCatalog()
+	#given in fakeSource_arr. For list structure see function comment
 	print("storing fake sources...")
 	fakeSourceCatalog = storeFakeSource(pointSourceCatalog=pointSourceCatalog, fakeSource=fakeSource_arr)
-	print("Done!")
-	print("run wsClean..")
-	# combination_array = runWSClean(uvCuts_arr=uvCuts_arr, robust_arr=robust_arr, taper_arr=taper_arr, fakeSource=fakeSource_arr, wscleanSize=wscleanSize, wscleanBaseLineAv=wscleanBaseLineAv, inputDirectory_arr=inputDirectory_arr, pointSourceCatalog=pointSourceCatalog, fakeSourceCatalog=fakeSourceCatalog, wscleanScale=wscleanScale)
-
+	print("running wsClean..")
 	combination_array = runWSClean(uvCuts_arr=uvCuts_arr, robust_arr=robust_arr, taper_arr=taper_arr, fakeSource=fakeSource_arr, wscleanSize=wscleanSize, wscleanBaseLineAv=wscleanBaseLineAv,
 	                               inputDirectory_arr=inputDirectory_arr, pointSourceCatalog=pointSourceCatalog, fakeSourceCatalog=fakeSourceCatalog, wscleanScale=wscleanScale)
 
@@ -978,7 +980,6 @@ def main():
 	# for comb in combination_array:
 	#	print(str(comb))
 
-	print("Done!")
 	print("Loading regions file...")
 	region, regionsFileName = findRegionFile()
 	print("RegionsFile "+str(regionsFileName)+" found! ("+str(region)+")")
@@ -990,8 +991,7 @@ def main():
 		            region, combination, galFWHM, fakeSource_arr, folding_do, targetbmaj, targetbmin, targetTheta)
 		print("Calculating PSF in: "+str(combination))
 		findPSFDistribution(combination, wscleanSize)
-	# ringIntMain(FWHMFitSteps, beamInformation[0], beamInformation[1], FWHMFitMinimum, FWHMFitMaximum, FWHMFitSteps, region, 'UV160_R02', galFWHM, fakeSource_arr, folding_do, targetbmaj, targetbmin, targetTheta)
-	# findPSFDistribution('UV160_R02', wscleanSize)
+
     removeTemporarySourceCatalogs()
 if __name__ == '__main__':
 	main()
