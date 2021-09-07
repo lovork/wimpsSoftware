@@ -47,40 +47,41 @@ def loadOptions():
 		if line.startswith("fitsFileName"):
 			fitsFileName = line[15:len(line)-1]
 		if line.startswith("fakeSourceArray"):
-			fakeSourceArray = line[18:len(line)-1]
+			fakeSourceArray = interpretAsArray(line[18:len(line)-1])
 		if line.startswith("uvCutArray"):
-			uvCutArray = line[13:len(line)-1]
+			uvCutArray = interpretAsIntList(line[13:len(line)-1])
 		if line.startswith("robustArray"):
-			robustArray = line[14:len(line)-1]
+			robustArray = interpretAsFloatList(line[14:len(line)-1])
 		if line.startswith("taperArray"):
-			taperArray = line[13:len(line)-1]
+			taperArray = interpretAsIntList(line[13:len(line)-1])
 		if line.startswith("wscleanSize"):
-			wscleanSize = line[14:len(line)-1]
+			wscleanSize = int(line[14:len(line)-1])
 		if line.startswith("baselineParameter"):
-			baselineParameter = line[20:len(line)-1]
+			baselineParameter = float(line[20:len(line)-1])
 		if line.startswith("beamInformation"):
-			beamInformation = line[18:len(line)-1]
+			beamInformation = interpretAsFloatList(line[18:len(line)-1])
 		if line.startswith("FWHMmin"):
-			FWHMmin = line[10:len(line)-1]
+			FWHMmin = float(line[10:len(line)-1])
 		if line.startswith("FWHMmax"):
-			FWHMmax = line[10:len(line)-1]
+			FWHMmax = float(line[10:len(line)-1])
 		if line.startswith("FWHMstep"):
-			FWHMstep = line[11:len(line)-1]
+			FWHMstep = float(line[11:len(line)-1])
 		if line.startswith("inputDirectoryArray"):
-			inputDirectoryArray = line[21:len(line)-1]
+			inputDirectoryArray = interpretAsArray(line[21:len(line)-1])
 		if line.startswith("wscleanScale"):
-			wscleanScale = line[15:len(line)-1]
+			wscleanScale = float(line[15:len(line)-1])
 		if line.startswith("galFWHM"):
-			galFWHM = line[10:len(line)-1]
+			galFWHM = float(line[10:len(line)-1])
 		if line.startswith("folding_do"):
-			folding_do = line[13:len(line)-1]
+			folding_do = bool(line[13:len(line)-1])
 		if line.startswith("targetbmaj"):
-			targetbmaj = line[13:len(line)-1]
+			targetbmaj = float(line[13:len(line)-1])
 		if line.startswith("targetbmin"):
-			targetbmin = line[13:len(line)-1]
+			targetbmin = float(line[13:len(line)-1])
 		if line.startswith("targetTheta"):
-			targetTheta = line[14:len(line)-1]
-
+			targetTheta = float(line[14:len(line)-1])
+        if line.startswith('removeFSC'):
+            removeFSC = bool(line[12:len(line)-1])
 	print("fitsfileName: "+str(fitsFileName))
 	print("fakeSouceArray: "+str(fakeSourceArray))
 	print("uvCutArray: "+str(uvCutArray))
@@ -99,8 +100,9 @@ def loadOptions():
 	print("targetbmaj: "+str(targetbmaj))
 	print("targetbmin: "+str(targetbmin))
 	print("targetTheta: "+str(targetTheta))
+    print('removeFSC: '+str(removeFSC))
 
-	return fitsFileName, fakeSourceArray, uvCutArray, robustArray, taperArray, wscleanSize, baselineParameter, beamInformation, FWHMmin, FWHMmax, FWHMstep, inputDirectoryArray, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta
+	return fitsFileName, fakeSourceArray, uvCutArray, robustArray, taperArray, wscleanSize, baselineParameter, beamInformation, FWHMmin, FWHMmax, FWHMstep, inputDirectoryArray, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta, removeFSC
 
 # extract header information and data from a primary HDU. data should have (1,1,x,y)-shape!
 # @param name: The name of the fits file
@@ -669,11 +671,7 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 				if datasheet.endswith("-MFS-image.fits"):
 					fitsFileName = datasheet
 					fitsFilePath = os.getcwd()+'/'+comb+'/'+file+'/'
-					print(".fitsfile without fake source found:\n" +
-					      str(fitsFilePath)+str(datasheet))
-					print("folding data from"+str(fitsFilePath)+str(fitsFileName))
-					fitsFileName = doGaussianFolding(
-					    folding_do, fitsFilePath, fitsFileName, targetbmaj, targetbmin, targetTheta, comb+'_foldedData.fits')
+					fitsFileName = doGaussianFolding(folding_do, fitsFilePath, fitsFileName, targetbmaj, targetbmin, targetTheta, comb+'_foldedData.fits')
 					fitsFilePath = os.getcwd()+'/'+comb+'/'+file+'/'+fitsFileName
 		# find fakesource data and store in list
 		if file.startswith("fakesource"):
@@ -681,14 +679,8 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 				if datasheet.endswith("-MFS-image.fits"):
 					fakefitsFileName = datasheet
 					fakefitsFilePath = os.getcwd()+'/'+comb+'/'+file+'/'
-					print(".fitsfiles with fake source found:\n" +
-					      str(fakefitsFilePath)+str(datasheet))
-					print("folding data from"+str(fakefitsFilePath)+str(fakefitsFileName))
-					fakefitsFileName = doGaussianFolding(
-					    folding_do, fakefitsFilePath, fakefitsFileName, targetbmaj, targetbmin, targetTheta, comb+'_foldedData.fits')
+					fakefitsFileName = doGaussianFolding(folding_do, fakefitsFilePath, fakefitsFileName, targetbmaj, targetbmin, targetTheta, comb+'_foldedData.fits')
 					fakefitsFilePath = os.getcwd()+'/'+comb+'/'+file+'/'+fakefitsFileName
-					print("Done!")
-	print("region found:\n"+str(regionstring))
 	# create output directory...
 	if not os.path.exists(os.getcwd()+'/'+comb+'/output'):
 		os.makedirs(os.getcwd()+'/'+comb+'/output')
@@ -700,11 +692,9 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 
 	wcs = loadWCS(h_real)
 	regionInformation = loadRegionFile(regionstring, wcs=wcs, data_header=h_real)
-	print("Loading information from regionsFile...\n"+"xcoordinate: " +
-	      str(regionInformation[0])+"\n"+"ycoordinate: "+str(regionInformation[1])+"\n"+"radius: "+str(regionInformation[2]))
+	
 	print("Calculating radial profile for observational data...")
-	dist, flux, yerr = findRadialProfile(xc=regionInformation[0], yc=regionInformation[1], steps=stepsForRadialProfile,
-	                                     radius=regionInformation[2], data_arr=d_real, header=h_real, beamInformation=beamInformation)
+	dist, flux, yerr = findRadialProfile(xc=regionInformation[0], yc=regionInformation[1], steps=stepsForRadialProfile, radius=regionInformation[2], data_arr=d_real, header=h_real, beamInformation=beamInformation)
 
 	# beamfolding and rescaling (arcsec -> arcmin)
 	dist_fr = rescaleArray(dist, (1./60.))
@@ -712,8 +702,7 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 	yerr_fr = rescaleArray(yerr, 10**6)
 
 	# writing data to .txtfile
-	writeData(path=outputpath, name="observational_data",
-	          xdata=dist_fr, ydata=flux_fr, yerror=yerr_fr)
+	writeData(path=outputpath, name="observational_data", xdata=dist_fr, ydata=flux_fr, yerror=yerr_fr)
 
 	# fit gaussian to observational data...
 	print("Fitting Gaussians to observational data...\n")
@@ -724,8 +713,7 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 	fitted_a_real_std = np.sqrt(pcov[0][0])
 	fitted_a_real_fr = fitted_a_real*10**6
 	fitted_a_real_std_fr = fitted_a_real_std*10**6
-	print("Best fitting for a gaussian to obsercational data " +
-	      str(fitted_a_real_fr)+" +/- "+str(fitted_a_real_std_fr))
+	print("Best fitting for a gaussian to obsercational data " + str(fitted_a_real_fr)+" +/- "+str(fitted_a_real_std_fr))
 
 	# filling arrays for the plot
 	bestfit_real = []  # flux values with gaussian distribution...
@@ -736,19 +724,16 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 	# rescaling Array Jy -> microJy and folding beam..
 	bestfit_real_fr = rescaleArray(bestfit_real, 10**6)
 
-	writeData(path=outputpath, name="gaussian_fit_for_observational_data",
-	          xdata=dist_fr, ydata=bestfit_real_fr, yerror=spaceholder)
+	writeData(path=outputpath, name="gaussian_fit_for_observational_data", xdata=dist_fr, ydata=bestfit_real_fr, yerror=spaceholder)
 
 	#######CALCULATIONS ON OBSERVATIONAL DATA + FAKE SOURCES#######
 
 	h_fake, d_fake = loadFitsFile(fakefitsFilePath)
 
 	# find radial profile for one fakesource...
-	print("Calculating radial profile for observational data + fakesource " +
-	      str(fakeSource[0]+"mJy "+str(fakeSource[1])+"arcsec "+str(fakeSource[2])+" "+str(fakeSource[3])))
+	print("Calculating radial profile for observational data + fakesource")
 
-	dist_f, flux_f, yerr_f = findRadialProfile(xc=regionInformation[0], yc=regionInformation[1], steps=stepsForRadialProfile,
-	                                           radius=regionInformation[2], data_arr=d_fake, header=h_fake, beamInformation=beamInformation)
+	dist_f, flux_f, yerr_f = findRadialProfile(xc=regionInformation[0], yc=regionInformation[1], steps=stepsForRadialProfile, radius=regionInformation[2], data_arr=d_fake, header=h_fake, beamInformation=beamInformation)
 
 	# beamfolding and rescaling (arcsec -> arcmin)
 	dist_f_fr = rescaleArray(dist_f, (1./60.))
@@ -756,8 +741,7 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 	yerr_f_fr = rescaleArray(yerr_f, 10**6)
 
 	# write fitted data to .txtfile...
-	writeData(path=outputpath, name="observational_data_+_fakesource_"+str(fakeSource[0])+"mJy_"+str(
-	    fakeSource[1])+"arcsec_"+str(fakeSource[2])+"_"+str(fakeSource[3]), xdata=dist_f_fr, ydata=flux_f_fr, yerror=yerr_f_fr)
+	writeData(path=outputpath, name="observational_data_+_fakesource_"+str(fakeSource[0])+"mJy_"+str(fakeSource[1])+"arcsec_"+str(fakeSource[2])+"_"+str(fakeSource[3]), xdata=dist_f_fr, ydata=flux_f_fr, yerror=yerr_f_fr)
 
 	# fit gaussian to observational + fakesource data
 	popt, pcov = curve_fit(f=gaussian, xdata=dist_f, ydata=flux_f, sigma=yerr_f)
@@ -765,8 +749,7 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 	fitted_a_fake_std = np.sqrt(pcov[0][0])
 	fitted_a_fake_fr = fitted_a_fake*10**6
 	fitted_a_fake_std_fr = fitted_a_fake_std*10**6
-	print("Best fitting a for gaussian with this fakesource: "+str(fakeSource[0])+"mJy "+str(fakeSource[1])+"arcsec "+str(
-	    fakeSource[2])+" "+str(fakeSource[3])+": "+str(fitted_a_fake_fr)+" +/- "+str(fitted_a_fake_std_fr))
+	print("Best fitting a for gaussian with this fakesource: "+str(fakeSource[0])+"mJy "+str(fakeSource[1])+"arcsec "+str(fakeSource[2])+" "+str(fakeSource[3])+": "+str(fitted_a_fake_fr)+" +/- "+str(fitted_a_fake_std_fr))
 
 	# filling arrays for the plot
 	bestfit_fake = []
@@ -777,31 +760,22 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 
 	bestfit_fake_fr = rescaleArray(bestfit_fake, 10**6)
 	# write fitted data to .txtfile
-	writeData(path=outputpath, name="gaussian_fit_for_observational_data_+_fake_source_"+str(fakeSource[0])+"_mJy_"+str(
-	    fakeSource[1])+"arcsec_"+str(fakeSource[2])+"_"+str(fakeSource[3]), xdata=dist_f_fr, ydata=bestfit_fake_fr, yerror=spaceholder_f)
+	writeData(path=outputpath, name="gaussian_fit_for_observational_data_+_fake_source_"+str(fakeSource[0])+"_mJy_"+str(fakeSource[1])+"arcsec_"+str(fakeSource[2])+"_"+str(fakeSource[3]), xdata=dist_f_fr, ydata=bestfit_fake_fr, yerror=spaceholder_f)
 
 	#######PLOTTING RESULTS#######
 
 	# Plotting radial profile...
-	print("Plotting radial profile...")
-	print("dist")
-	print(dist)
-	print("dist_fr:")
-	print(dist_fr)
+
 	fig, ax = plt.subplots()
 	# observational plot with data points and fitted gaussian
 	ax.plot(dist_fr, flux_fr, 'bs', label="Observation")
-	ax.errorbar(x=dist_fr, y=flux_fr, yerr=yerr_fr, color='b',
-	            fmt='o', alpha=1, drawstyle='default', capsize=3)
-	ax.plot(dist_fr, bestfit_real_fr, 'b--', label='Best fit gaussian with a = '+str(np.around(fitted_a_real_fr, 1)
-	        )+r' $\mu$Jy/beam $\pm$ '+str(np.around(fitted_a_real_std_fr, 1))+r' $\mu$Jy/beam')
+	ax.errorbar(x=dist_fr, y=flux_fr, yerr=yerr_fr, color='b', fmt='o', alpha=1, drawstyle='default', capsize=3)
+	ax.plot(dist_fr, bestfit_real_fr, 'b--', label='Best fit gaussian with a = '+str(np.around(fitted_a_real_fr, 1))+r' $\mu$Jy/beam $\pm$ '+str(np.around(fitted_a_real_std_fr, 1))+r' $\mu$Jy/beam')
 
 	# plot for observation + fakesources
 	ax.plot(dist_f_fr, flux_f_fr, 'ro', label="Observation + fake source")
-	ax.errorbar(x=dist_f_fr, y=flux_f_fr, yerr=yerr_f_fr, color='r',
-	            fmt='o', alpha=1, drawstyle='default', capsize=3)
-	ax.plot(dist_fr, bestfit_fake_fr, 'r--', label='Best fit gaussian with a = '+str(np.around(fitted_a_fake_fr, 1)
-	        )+r' $\mu$Jy/beam $\pm$ '+str(np.around(fitted_a_fake_std_fr, 1))+r' $\mu$Jy/beam')
+	ax.errorbar(x=dist_f_fr, y=flux_f_fr, yerr=yerr_f_fr, color='r', fmt='o', alpha=1, drawstyle='default', capsize=3)
+	ax.plot(dist_fr, bestfit_fake_fr, 'r--', label='Best fit gaussian with a = '+str(np.around(fitted_a_fake_fr, 1))+r' $\mu$Jy/beam $\pm$ '+str(np.around(fitted_a_fake_std_fr, 1))+r' $\mu$Jy/beam')
 
 	plt.xlabel(r'$\Theta$ [arcmin]')
 	plt.ylabel(r'$I_\nu$ [$\mu$Jy/beam]')
@@ -814,8 +788,7 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 
 	#######FITTING FOR DIFFERENT FWHM#######
 	# for observational data...
-	FWHM_real, a_real, e_real = findFitProfile(
-	    FWHMmin=FWHMFitMinimum, FWHMmax=FWHMFitMaximum, steps=FWHMFitSteps, xdata=dist, ydata=flux, yerror=yerr)
+	FWHM_real, a_real, e_real = findFitProfile(FWHMmin=FWHMFitMinimum, FWHMmax=FWHMFitMaximum, steps=FWHMFitSteps, xdata=dist, ydata=flux, yerror=yerr)
 	# folding...
 	FWHM_real_fr = rescaleArray(FWHM_real, (1./60.))
 	a_real_fr = rescaleArray(a_real, 10**6)
@@ -823,14 +796,11 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 
 	# plotting data...
 	plt.plot(FWHM_real_fr, a_real_fr, 'b-', label="Observation")
-	plt.fill_between(x=FWHM_real_fr, y1=np.subtract(
-	    a_real_fr, e_real_fr), y2=np.add(a_real_fr, e_real_fr), color='b', alpha=0.2)
-	writeData(path=outputpath, name="FWHM_plot_real",
-	          xdata=FWHM_real_fr, ydata=a_real_fr, yerror=e_real_fr)
+	plt.fill_between(x=FWHM_real_fr, y1=np.subtract(a_real_fr, e_real_fr), y2=np.add(a_real_fr, e_real_fr), color='b', alpha=0.2)
+	writeData(path=outputpath, name="FWHM_plot_real", xdata=FWHM_real_fr, ydata=a_real_fr, yerror=e_real_fr)
 
 	# for observational data + fakesource
-	FWHM_fake, a_fake, e_fake = findFitProfile(
-	    FWHMmin=FWHMFitMinimum, FWHMmax=FWHMFitMaximum, steps=FWHMFitSteps, xdata=dist_f, ydata=flux_f, yerror=yerr_f)
+	FWHM_fake, a_fake, e_fake = findFitProfile(FWHMmin=FWHMFitMinimum, FWHMmax=FWHMFitMaximum, steps=FWHMFitSteps, xdata=dist_f, ydata=flux_f, yerror=yerr_f)
 	FWHM_fake_fr = rescaleArray(FWHM_real, (1./60.))
 	a_fake_fr = rescaleArray(a_fake, 10**6)
 	e_fake_fr = rescaleArray(e_fake, 10**6)
@@ -839,8 +809,7 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 
 	# Plotting data...
 	plt.plot(FWHM_fake_fr, a_fake_fr, 'r-', label="Observation + fake source")
-	plt.fill_between(x=FWHM_fake_fr, y1=np.subtract(
-	    a_fake_fr, e_fake_fr), y2=np.add(a_fake_fr, e_fake_fr), color='r', alpha=0.2)
+	plt.fill_between(x=FWHM_fake_fr, y1=np.subtract(a_fake_fr, e_fake_fr), y2=np.add(a_fake_fr, e_fake_fr), color='r', alpha=0.2)
 
 	plt.legend(loc='upper right', fontsize='small', numpoints=1)
 	plt.xlabel("FWHM [arcmin]")
@@ -867,13 +836,11 @@ def findPSFDistribution(combination, wscleanSize):
 	# implement 0.5*wscleanSize as centerpoint and some radius?
 	regionInformationPSF = [0.5*wscleanSize, 0.5*wscleanSize, 200]
 	beamInformationPSF = [headerPSF['BMAJ'], headerPSF['BMIN']]
-	distPSF, fluxPSF, yerrPSF = findRadialProfilePSF(
-	    xc=regionInformationPSF[0], yc=regionInformationPSF[1], steps=1, radius=regionInformationPSF[2], data_arr=dataPSF, header=headerPSF, beamInformation=beamInformationPSF)
+	distPSF, fluxPSF, yerrPSF = findRadialProfilePSF(xc=regionInformationPSF[0], yc=regionInformationPSF[1], steps=1, radius=regionInformationPSF[2], data_arr=dataPSF, header=headerPSF, beamInformation=beamInformationPSF)
 
 	fig, ax = plt.subplots()
 	ax.plot(rescaleArray(distPSF, (1./60)), fluxPSF, 'b-', label='Observation')
-	ax.errorbar(x=rescaleArray(distPSF, (1./60)), y=fluxPSF, yerr=yerrPSF,
-	            color='b', alpha=0.5, drawstyle='default', capsize=3)
+	ax.errorbar(x=rescaleArray(distPSF, (1./60)), y=fluxPSF, yerr=yerrPSF,color='b', alpha=0.5, drawstyle='default', capsize=3)
 	plt.xlabel('radius [arcmin]')
 	plt.ylabel('PSF [Jy/beam]')
 	plt.title('Weighting for '+comb)
@@ -922,11 +889,26 @@ def interpretAsFloatList(inputString):
 		i += 1
 	return out
 
+
+def cleanUp(removeFSC, fakeSourceCatalog):
+    print('Removing temporary files...')
+    removeTemporarySourceCatalogs()
+    if removeFSC:
+        print('Removing Fake Source Catalog...')
+        removeFakeSourceCatalog(fakeSourceCatalog)
+        
+        
+        
 # removes the point source catalogs that has been created additionally
 def removeTemporarySourceCatalogs():
     for file in os.listdir():
         if file.endswith('.sourcedb'):
             os.remove(file)
+            
+
+#removes the fake source catalog 
+def removeFakeSourceCatalog(fakeSourceCatalog):
+    os.remove(fakeSourceCatalog)
 
 #filters the files in the cwd for a bbs point source catalog. 
 #Make sure that there is only one of them in the cwd!
@@ -941,48 +923,32 @@ def findPointSourceCatalog():
 # main method.
 def main():
     
-    #loading parameter sheet
+    ####OPTION SHEET
 	print("loading parameter sheet..")
-	initFitsFileName, fakeSource_arr, uvCuts_arr, robust_arr, taper_arr, wscleanSize, wscleanBaseLineAv, beamInformation, FWHMFitMinimum, FWHMFitMaximum, FWHMFitSteps, inputDirectory_arr, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta = loadOptions()
-	# rewrite input strings as arrays when needed..
-	fakeSource_arr = interpretAsArray(fakeSource_arr)
-	uvCuts_arr = interpretAsIntList(uvCuts_arr)
-	robust_arr = interpretAsFloatList(robust_arr)
-	taper_arr = interpretAsIntList(taper_arr)
-	wscleanSize = int(wscleanSize)
-	wscleanBaseLineAv = float(wscleanBaseLineAv)
-	beamInformation = interpretAsFloatList(beamInformation)
-	FWHMFitMinimum = float(FWHMFitMinimum)
-	FWHMFitMaximum = float(FWHMFitMaximum)
-	FWHMFitSteps = float(FWHMFitSteps)
-	inputDirectory_arr = interpretAsArray(inputDirectory_arr)
-	wscleanScale = float(wscleanScale)
-	galFWHM = float(galFWHM)
-	folding_do = bool(folding_do)
-	targetbmaj = float(targetbmaj)
-	targetbmin = float(targetbmin)
-	targetTheta = float(targetTheta)
+	initFitsFileName, fakeSource_arr, uvCuts_arr, robust_arr, taper_arr, wscleanSize, wscleanBaseLineAv, beamInformation, FWHMFitMinimum, FWHMFitMaximum, FWHMFitSteps, inputDirectory_arr, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta, removeFSC = loadOptions()
+    
+    ####POINT SOURCE CATALOG
     print('searching for a point source catalog...')
 	pointSourceCatalog = findPointSourceCatalog()
+    
+    ####FAKE SOURCE
 	#given in fakeSource_arr. For list structure see function comment
 	print("storing fake sources...")
 	fakeSourceCatalog = storeFakeSource(pointSourceCatalog=pointSourceCatalog, fakeSource=fakeSource_arr)
+    print('fake source stored in '+str(fakeSourceCatalog))
+    
+    ####CLEANING
 	print("running wsClean..")
 	combination_array = runWSClean(uvCuts_arr=uvCuts_arr, robust_arr=robust_arr, taper_arr=taper_arr, fakeSource=fakeSource_arr, wscleanSize=wscleanSize, wscleanBaseLineAv=wscleanBaseLineAv,
 	                               inputDirectory_arr=inputDirectory_arr, pointSourceCatalog=pointSourceCatalog, fakeSourceCatalog=fakeSourceCatalog, wscleanScale=wscleanScale)
 
-	# no wsclean/PyBDSF
-	# combination_array = []
-	# for file in os.listdir(os.getcwd()):
-	#	if file.startswith('UV'):
-	#		combination_array.append(file)
-	# print("Found the following combinations...\n")
-	# for comb in combination_array:
-	#	print(str(comb))
-
+	
+    ####REGION FILE
 	print("Loading regions file...")
 	region, regionsFileName = findRegionFile()
 	print("RegionsFile "+str(regionsFileName)+" found! ("+str(region)+")")
+    
+    ####CREATING PLOTS
 	print("Run Main Ring integration..")
 	for combination in combination_array:
 
@@ -991,8 +957,13 @@ def main():
 		            region, combination, galFWHM, fakeSource_arr, folding_do, targetbmaj, targetbmin, targetTheta)
 		print("Calculating PSF in: "+str(combination))
 		findPSFDistribution(combination, wscleanSize)
-
-    removeTemporarySourceCatalogs()
+    
+    
+    ####CLEAN UP
+    cleanUp(removeFSC, fakeSourceCatalog)
+    
+    
+    
 if __name__ == '__main__':
 	main()
 

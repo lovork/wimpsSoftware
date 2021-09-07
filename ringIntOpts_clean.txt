@@ -64,3 +64,6 @@ targetSigmaY =
 
 #18th parameter: target angle in degree
 targetTheta = 
+
+#19th parameter: remove FakeSourceCatalog with temporary files
+removeFSC = 
