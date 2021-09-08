@@ -80,8 +80,8 @@ def loadOptions():
 			targetbmin = float(line[13:len(line)-1])
 		if line.startswith("targetTheta"):
 			targetTheta = float(line[14:len(line)-1])
-        if line.startswith('removeFSC'):
-            removeFSC = bool(line[12:len(line)-1])
+		if line.startswith('removeFSC'):
+			removeFSC = bool(line[12:len(line)-1])
 	print("fitsfileName: "+str(fitsFileName))
 	print("fakeSouceArray: "+str(fakeSourceArray))
 	print("uvCutArray: "+str(uvCutArray))
@@ -100,7 +100,7 @@ def loadOptions():
 	print("targetbmaj: "+str(targetbmaj))
 	print("targetbmin: "+str(targetbmin))
 	print("targetTheta: "+str(targetTheta))
-    print('removeFSC: '+str(removeFSC))
+	print('removeFSC: '+str(removeFSC))
 
 	return fitsFileName, fakeSourceArray, uvCutArray, robustArray, taperArray, wscleanSize, baselineParameter, beamInformation, FWHMmin, FWHMmax, FWHMstep, inputDirectoryArray, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta, removeFSC
 
@@ -928,14 +928,14 @@ def main():
 	initFitsFileName, fakeSource_arr, uvCuts_arr, robust_arr, taper_arr, wscleanSize, wscleanBaseLineAv, beamInformation, FWHMFitMinimum, FWHMFitMaximum, FWHMFitSteps, inputDirectory_arr, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta, removeFSC = loadOptions()
     
     ####POINT SOURCE CATALOG
-    print('searching for a point source catalog...')
+	print('searching for a point source catalog...')
 	pointSourceCatalog = findPointSourceCatalog()
     
     ####FAKE SOURCE
 	#given in fakeSource_arr. For list structure see function comment
 	print("storing fake sources...")
 	fakeSourceCatalog = storeFakeSource(pointSourceCatalog=pointSourceCatalog, fakeSource=fakeSource_arr)
-    print('fake source stored in '+str(fakeSourceCatalog))
+	print('fake source stored in '+str(fakeSourceCatalog))
     
     ####CLEANING
 	print("running wsClean..")
@@ -960,7 +960,7 @@ def main():
     
     
     ####CLEAN UP
-    cleanUp(removeFSC, fakeSourceCatalog)
+	cleanUp(removeFSC, fakeSourceCatalog)
     
     
     
