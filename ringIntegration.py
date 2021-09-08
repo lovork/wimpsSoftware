@@ -110,11 +110,9 @@ def loadOptions():
 
 
 def loadFitsFile(name):
-    fitsname = get_pkg_data_filename(name)
-    f = fits.open(fitsname)
-    if len(f[0].data.shape) != 4:
-        raise AttributeError('data shape doesn\'t fit! (Must be (1,1,x,y))')
-    return f[0].header, f[0].data
+	fitsname = get_pkg_data_filename(name)
+	f = fits.open(fitsname)
+	return f[0].header, f[0].data
 
 # loads the world coordinate system from a fits file or mask
 # @param data_header: the header of the fits file or mask
@@ -939,8 +937,7 @@ def main():
     
     ####CLEANING
 	print("running wsClean..")
-	combination_array = runWSClean(uvCuts_arr=uvCuts_arr, robust_arr=robust_arr, taper_arr=taper_arr, fakeSource=fakeSource_arr, wscleanSize=wscleanSize, wscleanBaseLineAv=wscleanBaseLineAv,
-	                               inputDirectory_arr=inputDirectory_arr, pointSourceCatalog=pointSourceCatalog, fakeSourceCatalog=fakeSourceCatalog, wscleanScale=wscleanScale)
+	combination_array = runWSClean(uvCuts_arr=uvCuts_arr, robust_arr=robust_arr, taper_arr=taper_arr, fakeSource=fakeSource_arr, wscleanSize=wscleanSize, wscleanBaseLineAv=wscleanBaseLineAv, inputDirectory_arr=inputDirectory_arr, pointSourceCatalog=pointSourceCatalog, fakeSourceCatalog=fakeSourceCatalog, wscleanScale=wscleanScale)
 
 	
     ####REGION FILE
@@ -951,14 +948,11 @@ def main():
     ####CREATING PLOTS
 	print("Run Main Ring integration..")
 	for combination in combination_array:
-
 		print("Calculating in: "+str(combination))
-		ringIntMain(FWHMFitSteps, beamInformation[0], beamInformation[1], FWHMFitMinimum, FWHMFitMaximum, FWHMFitSteps,
-		            region, combination, galFWHM, fakeSource_arr, folding_do, targetbmaj, targetbmin, targetTheta)
+		ringIntMain(FWHMFitSteps, beamInformation[0], beamInformation[1], FWHMFitMinimum, FWHMFitMaximum, FWHMFitSteps, region, combination, galFWHM, fakeSource_arr, folding_do, targetbmaj, targetbmin, targetTheta)
 		print("Calculating PSF in: "+str(combination))
 		findPSFDistribution(combination, wscleanSize)
-    
-    
+
     ####CLEAN UP
 	cleanUp(removeFSC, fakeSourceCatalog)
     
