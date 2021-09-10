@@ -35,20 +35,29 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 
+
+
+
+
+
 # loads values from the 'ringIntOpts.txt' option sheet.
 # make sure to remove the '_clean' from the file name if you are using a new version!
 # @return: all values stored in the option sheet.
-
-
 def loadOptions():
-	r = open("ringIntOpts.txt", "r")
-	lines = r.readlines()
-	for line in lines:
-		if line.startswith("fitsFileName"):
-			fitsFileName = line[15:len(line)-1]
-		if line.startswith("fakeSourceArray"):
-			fakeSourceArray = interpretAsArray(line[18:len(line)-1])
-		if line.startswith("uvCutArray"):
+    try:
+        r =  open("ringIntOpts.txt", "r")
+    except FileNotFoundError:
+        print('ERROR: Options sheet not found!')
+        print('Check working directory!')
+        sys.exit()
+        
+    lines = r.readlines()
+    for line in lines:
+        if line.startswith("fitsFileName"):
+            fitsFileName = line[15:len(line)-1]
+        if line.startswith("fakeSourceArray"):
+            fakeSourceArray = interpretAsArray(line[18:len(line)-1])
+        if line.startswith("uvCutArray"):
 			uvCutArray = interpretAsIntList(line[13:len(line)-1])
 		if line.startswith("robustArray"):
 			robustArray = interpretAsFloatList(line[14:len(line)-1])
@@ -583,7 +592,12 @@ def findRegionFile():
 	for file in os.listdir(os.getcwd()):
 		if file.endswith(".reg") and not file.endswith(".ds9.reg"):
 			regionsFileName = file
-	r = open(regionsFileName, "r")
+    try:
+        r = open(regionsFileName, "r")
+    except FileNotFoundError:
+        print('ERROR: Region file not found!')
+        print('Check working directory')
+        sys.exit()
 	for line in r.readlines():
 		if 'circle' in line:
 			region = line[line.find("(")+1: line.find(")")].split(",")
@@ -685,7 +699,12 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 	outputpath = os.getcwd()+'/'+comb+'/output/'
 
 	#######CALCULATION ON OBSERVATIONAL DATA#######
-	print("Data name: "+fitsFilePath)
+    try:
+        print("Data name: "+fitsFilePath)
+    except UnboundLocalError:
+        print('ERROR: FITS file not found! (Probably a cleaning error)')
+        print('Check WSClean log above!')
+        sys.exit()
 	h_real, d_real = loadFitsFile(fitsFilePath)
 
 	wcs = loadWCS(h_real)
@@ -828,6 +847,7 @@ def findPSFDistribution(combination, wscleanSize):
 				if datasheet.endswith('-MFS-psf.fits'):
 					name = datasheet
 					path = os.getcwd()+'/'+combination+'/'+file+'/'+name
+            
 	print("Found PSF: " + name)
 	headerPSF, dataPSF = loadFitsFile(path)
 	wcs = loadWCS(headerPSF)
@@ -914,7 +934,12 @@ def findPointSourceCatalog():
     for file in os.listdir(os.getcwd()):
         if file.endswith('.bbs'):
             out = file
-            print('Found Point Source Catalog: '+str(file))
+    try:
+        print('Found Point Source Catalog: '+str(file))
+    except UnboundLocalError:
+        print('ERROR: Point Source Catalog not found!')
+        print('Check working directory!')
+        sys.exit()
     return out
 
 
