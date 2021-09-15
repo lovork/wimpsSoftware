@@ -35,29 +35,24 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 
-
-
-
-
-
 # loads values from the 'ringIntOpts.txt' option sheet.
 # make sure to remove the '_clean' from the file name if you are using a new version!
 # @return: all values stored in the option sheet.
 def loadOptions():
-    try:
-        r =  open("ringIntOpts.txt", "r")
-    except FileNotFoundError:
-        print('ERROR: Options sheet not found!')
-        print('Check working directory!')
-        sys.exit()
-        
-    lines = r.readlines()
-    for line in lines:
-        if line.startswith("fitsFileName"):
-            fitsFileName = line[15:len(line)-1]
-        if line.startswith("fakeSourceArray"):
-            fakeSourceArray = interpretAsArray(line[18:len(line)-1])
-        if line.startswith("uvCutArray"):
+	try:
+		r = open("ringIntOpts.txt", "r")
+	except FileNotFoundError:
+		print('ERROR: Options sheet not found!')
+		print('Check working directory!')
+		sys.exit()
+
+	lines = r.readlines()
+	for line in lines:
+		if line.startswith("fitsFileName"):
+			fitsFileName = line[15:len(line)-1]
+		if line.startswith("fakeSourceArray"):
+			fakeSourceArray = interpretAsArray(line[18:len(line)-1])
+		if line.startswith("uvCutArray"):
 			uvCutArray = interpretAsIntList(line[13:len(line)-1])
 		if line.startswith("robustArray"):
 			robustArray = interpretAsFloatList(line[14:len(line)-1])
@@ -91,26 +86,29 @@ def loadOptions():
 			targetTheta = float(line[14:len(line)-1])
 		if line.startswith('removeFSC'):
 			removeFSC = bool(line[12:len(line)-1])
-	print("fitsfileName: "+str(fitsFileName))
-	print("fakeSouceArray: "+str(fakeSourceArray))
-	print("uvCutArray: "+str(uvCutArray))
-	print("robustArray: "+str(robustArray))
-	print("taperArray: "+str(taperArray))
-	print("wscleanSize: "+str(wscleanSize))
-	print("baselineParameter: "+str(baselineParameter))
-	print("beamInformation: "+str(beamInformation))
-	print("FWHMmin: "+str(FWHMmin))
-	print("FWHMmax: "+str(FWHMmax))
-	print("FWHMstep: "+str(FWHMstep))
-	print("inputDirectoryArray: "+str(inputDirectoryArray))
-	print("wscleanScale: "+str(wscleanScale))
-	print("galFWHM: "+str(galFWHM))
-	print("folding_do: "+str(folding_do))
-	print("targetbmaj: "+str(targetbmaj))
-	print("targetbmin: "+str(targetbmin))
-	print("targetTheta: "+str(targetTheta))
-	print('removeFSC: '+str(removeFSC))
-
+	try:
+		print("FITSfileName: "+str(fitsFileName))
+		print("fakeSourceArray: "+str(fakeSourceArray))
+		print("uvCutArray: "+str(uvCutArray))
+		print("robustArray: "+str(robustArray))
+		print("taperArray: "+str(taperArray))
+		print("wscleanSize: "+str(wscleanSize))
+		print("baselineParameter: "+str(baselineParameter))
+		print("beamInformation: "+str(beamInformation))
+		print("FWHMmin: "+str(FWHMmin))
+		print("FWHMmax: "+str(FWHMmax))
+		print("FWHMstep: "+str(FWHMstep))
+		print("inputDirectoryArray: "+str(inputDirectoryArray))
+		print("wscleanScale: "+str(wscleanScale))
+		print("galFWHM: "+str(galFWHM))
+		print("folding_do: "+str(folding_do))
+		print("targetbmaj: "+str(targetbmaj))
+		print("targetbmin: "+str(targetbmin))
+		print("targetTheta: "+str(targetTheta))
+		print('removeFSC: '+str(removeFSC))
+	except UnboundLocalError:
+		print('ERROR: Error in the loading process of the option sheet')
+		sys.exit()
 	return fitsFileName, fakeSourceArray, uvCutArray, robustArray, taperArray, wscleanSize, baselineParameter, beamInformation, FWHMmin, FWHMmax, FWHMstep, inputDirectoryArray, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta, removeFSC
 
 # extract header information and data from a primary HDU. data should have (1,1,x,y)-shape!
@@ -170,8 +168,7 @@ def ringIntWithMean(xc, yc, rmin, rmax, data_arr, header, beamInformation):
 				px += 1
 
 	# 20 = folded FWHM
-	n_beams = np.pi*(pixelsToArcsecs(rmax, header)**2 -
-	                 pixelsToArcsecs(rmin, header)**2)/(1.133*20**2)
+	n_beams = np.pi*(pixelsToArcsecs(rmax, header)**2 - pixelsToArcsecs(rmin, header)**2)/(1.133*20**2)
 	return np.mean(flux_array), np.std(flux_array)/np.sqrt(n_beams)
 
 
@@ -188,9 +185,8 @@ def ringIntWithMeanPSF(xc, yc, rmin, rmax, data_arr, header, beamInformation):
 				flux_array.append(data_arr[0][0][i][j])
 				px += 1
 
-    # 20 = folded FWHM
-	n_beams = np.pi*(pixelsToArcsecs(rmax, header)**2 -
-	                 pixelsToArcsecs(rmin, header)**2)/(1.133*20**2)
+	# 20 = folded FWHM
+	n_beams = np.pi*(pixelsToArcsecs(rmax, header)**2 - pixelsToArcsecs(rmin, header)**2)/(1.133*20**2)
 	return np.mean(flux_array), np.std(flux_array)/np.sqrt(n_beams)
 
 # returns a radial flux profile of a circle shaped area with a radius and it's center in PIXELS (xc,yc).
@@ -215,10 +211,7 @@ def findRadialProfile(xc, yc, steps, radius, data_arr, header, beamInformation):
 	r = 0
 
 	while r <= radius:
-
-		fluxmean, fluxstd = ringIntWithMean(
-		    xc=xc, yc=yc, rmin=r, rmax=r+steps, data_arr=data_arr, header=header, beamInformation=beamInformation)
-
+		fluxmean, fluxstd = ringIntWithMean(xc=xc, yc=yc, rmin=r, rmax=r+steps, data_arr=data_arr, header=header, beamInformation=beamInformation)
 		distance_arr.append(pixelsToArcsecs(r, header))
 		flux_arr.append(fluxmean)
 		yerror.append(fluxstd)
@@ -235,10 +228,7 @@ def findRadialProfilePSF(xc, yc, steps, radius, data_arr, header, beamInformatio
 	r = 0
 
 	while r <= radius:
-
-		fluxmean, fluxstd = ringIntWithMeanPSF(
-		    xc=xc, yc=yc, rmin=r, rmax=r+steps, data_arr=data_arr, header=header, beamInformation=beamInformation)
-
+		fluxmean, fluxstd = ringIntWithMeanPSF(xc=xc, yc=yc, rmin=r, rmax=r+steps, data_arr=data_arr, header=header, beamInformation=beamInformation)
 		distance_arr.append(pixelsToArcsecs(r, header))
 		flux_arr.append(fluxmean)
 		yerror.append(fluxstd)
@@ -258,8 +248,7 @@ def loadRegionFile(region, wcs, data_header):
 	region_array = []
 	print(region[0])
 	print(region[1])
-	c = SkyCoord(str(region[0])+" "+str(region[1]),
-	             frame=FK5, unit=(u.hourangle, u.deg))
+	c = SkyCoord(str(region[0])+" "+str(region[1]), frame=FK5, unit=(u.hourangle, u.deg))
 	if region[2].endswith('"'):
 		radius = float(region[2].replace('"', ''))/3600
 	elif region[2].endswith("'"):
@@ -286,8 +275,6 @@ def writeData(path, name, xdata, ydata, yerror):
 			l += 1
 
 # simple gaussian with an amplitude a and a FWHM binit. Needed for fitting
-
-
 def gaussian(x, a):
 	return a*np.e**((-x**2)/(2*binit**2))
 
@@ -352,12 +339,10 @@ def findPointSources(fitsFileName):
 	img = bdsf.process_image(fitsFileName, atrous_do=True, rms_box=(60, 20))
 
 	# save catalog file as .bbs file
-	img.write_catalog(outfile=pointSourceCatalog,
-	                  catalog_type='gaul', clobber=True, format='bbs')
+	img.write_catalog(outfile=pointSourceCatalog, catalog_type='gaul', clobber=True, format='bbs')
 
 	# save catalog file also as .ds9.reg file
-	img.write_catalog(outfile=pointSourceCatalogName + ".ds9.reg",
-	                  catalog_type='gaul', clobber=True, format='ds9')
+	img.write_catalog(outfile=pointSourceCatalogName + ".ds9.reg", catalog_type='gaul', clobber=True, format='ds9')
 	print("Point source Catalog: "+str(pointSourceCatalog))
 	return pointSourceCatalog
 
@@ -371,16 +356,14 @@ def findPointSources(fitsFileName):
 
 def storeFakeSource(pointSourceCatalog, fakeSource):
 	# find name for fake source catalog
-	fakeSourceCatalog = pointSourceCatalog[:len(pointSourceCatalog) - 23]+"_"+str(
-	    fakeSource[0])+"mJy_"+str(fakeSource[1])+"arcsec"+str(fakeSource[2])+","+str(fakeSource[3])+".bbs"
+	fakeSourceCatalog = pointSourceCatalog[:len(pointSourceCatalog) - 23]+"_"+str(fakeSource[0])+"mJy_"+str(fakeSource[1])+"arcsec"+str(fakeSource[2])+","+str(fakeSource[3])+".bbs"
 
 	# copying point source catalog
 	copyfile(pointSourceCatalog, fakeSourceCatalog)
 	r = open(fakeSourceCatalog, "a")
 	i = 0
 	# writing fake sources...
-	r.write("sim_gauss"+str(i)+", GAUSSIAN, "+str(fakeSource[2])+","+str(fakeSource[3])+", -"+str(
-	    fakeSource[0])+"e-3,0.,0.,0.,"+str(fakeSource[1])+", "+str(fakeSource[1])+",  0.,1.43651e+08, [-0.8]")
+	r.write("sim_gauss"+str(i)+", GAUSSIAN, "+str(fakeSource[2])+","+str(fakeSource[3])+", -"+str(fakeSource[0])+"e-3,0.,0.,0.,"+str(fakeSource[1])+", "+str(fakeSource[1])+",  0.,1.43651e+08, [-0.8]")
 	print("Fake source catalog: "+str(fakeSourceCatalog))
 	return fakeSourceCatalog
 
@@ -390,13 +373,10 @@ def storeFakeSource(pointSourceCatalog, fakeSource):
 # @param pointSourceCatalog: PSC which will be subtracted
 def subtractPointSources(inputDirectory_arr, pointSourceCatalog):
 	# change type of pointSourceCatalog:
-	print("makesourcedb in="+str(pointSourceCatalog)+" out=" +
-	      str(pointSourceCatalog)+".sourcedb outtype=blob append=False")
-	os.system("makesourcedb in="+str(pointSourceCatalog)+" out=" +
-	          str(pointSourceCatalog)+".sourcedb outtype=blob append=False")
+	print("makesourcedb in="+str(pointSourceCatalog)+" out=" + str(pointSourceCatalog)+".sourcedb outtype=blob append=False")
+	os.system("makesourcedb in="+str(pointSourceCatalog)+" out=" + str(pointSourceCatalog)+".sourcedb outtype=blob append=False")
 	for inputDir in inputDirectory_arr:
-		os.system("DPPP msin="+str(inputDir) +
-		          " msin.datacolumn=DATA msout=. msout.datacolumn=CORRECTED_DATA steps=[predict] predict.type=predict predict.operation=subtract predict.sourcedb="+str(pointSourceCatalog)+".sourcedb")
+		os.system("DPPP msin="+str(inputDir) + " msin.datacolumn=DATA msout=. msout.datacolumn=CORRECTED_DATA steps=[predict] predict.type=predict predict.operation=subtract predict.sourcedb="+str(pointSourceCatalog)+".sourcedb")
 
 
 # run WSClean commands for different UV Cuts, weightings and, for negative weightings, with different gaussian tapers.
@@ -592,11 +572,11 @@ def findRegionFile():
 	for file in os.listdir(os.getcwd()):
 		if file.endswith(".reg") and not file.endswith(".ds9.reg"):
 			regionsFileName = file
-    try:
-        r = open(regionsFileName, "r")
-    except FileNotFoundError:
-        print('ERROR: Region file not found!')
-        print('Check working directory')
+	try:
+		r = open(regionsFileName, "r")
+	except FileNotFoundError:
+		print('ERROR: Region file not found!')
+		print('Check working directory')
         sys.exit()
 	for line in r.readlines():
 		if 'circle' in line:
@@ -699,12 +679,12 @@ def ringIntMain(stepsForRadialProfile, beamx, beamy, FWHMFitMinimum, FWHMFitMaxi
 	outputpath = os.getcwd()+'/'+comb+'/output/'
 
 	#######CALCULATION ON OBSERVATIONAL DATA#######
-    try:
-        print("Data name: "+fitsFilePath)
-    except UnboundLocalError:
-        print('ERROR: FITS file not found! (Probably a cleaning error)')
-        print('Check WSClean log above!')
-        sys.exit()
+	try:
+		print("Data name: "+fitsFilePath)
+	except UnboundLocalError:
+		print('ERROR: FITS file not found! (Probably a cleaning error)')
+		print('Check WSClean log above!')
+		sys.exit()
 	h_real, d_real = loadFitsFile(fitsFilePath)
 
 	wcs = loadWCS(h_real)
@@ -847,7 +827,7 @@ def findPSFDistribution(combination, wscleanSize):
 				if datasheet.endswith('-MFS-psf.fits'):
 					name = datasheet
 					path = os.getcwd()+'/'+combination+'/'+file+'/'+name
-            
+
 	print("Found PSF: " + name)
 	headerPSF, dataPSF = loadFitsFile(path)
 	wcs = loadWCS(headerPSF)
@@ -945,16 +925,14 @@ def findPointSourceCatalog():
 
 # main method.
 def main():
-    
-    ####OPTION SHEET
+	####OPTION SHEET
 	print("loading parameter sheet..")
 	initFitsFileName, fakeSource_arr, uvCuts_arr, robust_arr, taper_arr, wscleanSize, wscleanBaseLineAv, beamInformation, FWHMFitMinimum, FWHMFitMaximum, FWHMFitSteps, inputDirectory_arr, wscleanScale, galFWHM, folding_do, targetbmaj, targetbmin, targetTheta, removeFSC = loadOptions()
-    
-    ####POINT SOURCE CATALOG
+	####POINT SOURCE CATALOG
 	print('searching for a point source catalog...')
 	pointSourceCatalog = findPointSourceCatalog()
-    
-    ####FAKE SOURCE
+
+	####FAKE SOURCE
 	#given in fakeSource_arr. For list structure see function comment
 	print("storing fake sources...")
 	fakeSourceCatalog = storeFakeSource(pointSourceCatalog=pointSourceCatalog, fakeSource=fakeSource_arr)
